@@ -1,6 +1,4 @@
-import transcribe
-import audio_handler
-
+from SygnalsInterpretation.src.audio_handler import audio_handler, transcribe
 
 """Машинное обучение — класс методов искусственного интеллекта, 
 характерной чертой которых является непрямое решение задачи, 
@@ -9,7 +7,7 @@ import audio_handler
 математического анализа, методов оптимизации, различные техники работы с данными в цифровой форме."""
 """                     ||                      """
 """                     \/                      """
-audio_file_path = "audio_test.mp3"
+audio_file_path = "dataset/audio_test.mp3"
 
 
 if __name__ == "__main__":

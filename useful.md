@@ -9,5 +9,5 @@
 Достаточно скачать библиотеку `whisper-timestamped` по инструкции, указанной на Github в источнике \
 ```pip3 install git+https://github.com/linto-ai/whisper-timestamped```
 
-Пример [аудио](src/audio_test.mp3) - вырезается слово "методов" из аудиодорожки. 
+Пример [аудио](dataset/audio_test.mp3) - вырезается слово "методов" из аудиодорожки. 
 В функции main в комментарии указан текст аудио.
