@@ -1,5 +1,7 @@
+import random
 from SygnalsInterpretation.src.audio_handler import audio_handler, transcribe
-
+from audio_handler.transcribe import cut_fillers
+import model
 """Машинное обучение — класс методов искусственного интеллекта, 
 характерной чертой которых является непрямое решение задачи, 
 а обучение — за счет применения решений множество сходных задач. 
@@ -7,16 +9,25 @@ from SygnalsInterpretation.src.audio_handler import audio_handler, transcribe
 математического анализа, методов оптимизации, различные техники работы с данными в цифровой форме."""
 """                     ||                      """
 """                     \/                      """
-audio_file_path = "dataset/audio_test.mp3"
+"""  Короче, я пришел домой и начал ужинать. Вскоре из окна начали кричать типа молодые люди и сильно шуметь.
+ По факту ничего особенного и я без проблем уснул. Прикинь, если бы я проспал и в натуре бы опоздал."""
+audio_file_path = "dataset/cool_story.mp3"
 
 
 if __name__ == "__main__":
-    # Распознание
-    start, end = transcribe.get_segments_by_word(audio_file_path)
+    start, end = cut_fillers(audio_file_path)
+    """
+    1. Распознаем аудио
+    2. Разбиваем по предложениям (составить по сегментам), передаем в модель
+    3. Предложение передаем в model.predict -> [a,b]. a - Слово паразит, b - нет
+    4. if a >= 0.8 
+        cut_by_world(...)
+        
+    """
 
     # Вырезание
     ex_audio = audio_handler.cut(audio_file_path, start, end)
-    ex_audio.export(f"ans.mp3", format="mp3")
+    ex_audio.export(f"ans_cut{random.randint(1,100)}.mp3", format="mp3")
 
 
 
