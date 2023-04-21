@@ -56,15 +56,12 @@ class BertClassifier:
         self.model.to(self.device)
 
     def preparation(self, X_train, y_train, X_valid, y_valid):
-        # create datasets
         self.train_set = CustomDataset(X_train, y_train, self.tokenizer)
         self.valid_set = CustomDataset(X_valid, y_valid, self.tokenizer)
 
-        # create data loaders
         self.train_loader = DataLoader(self.train_set, batch_size=2, shuffle=True)
         self.valid_loader = DataLoader(self.valid_set, batch_size=2, shuffle=True)
 
-        # helpers initialization
         self.optimizer = AdamW(self.model.parameters(), lr=2e-5, correct_bias=False)
         self.scheduler = get_linear_schedule_with_warmup(
             self.optimizer,
@@ -141,9 +138,9 @@ class BertClassifier:
             print(f'Val loss {val_loss} accuracy {val_acc}')
             print('-' * 10)
 
-            #if val_acc > best_accuracy:
-            torch.save(self.model, './bert.pt')
-            best_accuracy = val_acc
+            if val_acc > best_accuracy:
+                torch.save(self.model, './bert.pt')
+                best_accuracy = val_acc
 
         self.model = torch.load('./bert.pt')
 
@@ -173,12 +170,12 @@ class BertClassifier:
             input_ids=input_ids.unsqueeze(0),
             attention_mask=attention_mask.unsqueeze(0)
         )
-        tmp = torch.argmax(outputs.logits, dim=1)
-        tmp = tmp.cpu()
-        tmp = tmp.numpy()
+        inter = outputs.logits.cpu().detach().numpy()
+
+
         prediction = torch.argmax(outputs.logits, dim=1).cpu().numpy()[0]
 
-        return prediction
+        return prediction, inter
 
 
 def compile():
@@ -222,12 +219,20 @@ def compile():
             X_valid=test_data,
             y_valid=y_test
         )
-    classifier.train()
+    #classifier.train()
 
     texts = list(X_valid)
     labels = list(y_valid)
 
-    predictions = [classifier.predict(t) for t in texts]
+    predictions = []
+    pred_inters = []
+    for t in texts:
+        pred, inter = classifier.predict(t)
+        predictions.append(pred)
+        pred_inters.append(inter)
+
+    flat_preds = [item[1] for sublist in pred_inters for item in sublist]
+    flat_preds = (flat_preds - min(flat_preds)) / (max(flat_preds) - min(flat_preds))
 
     my_tests = ["эта машина кажется короче красного грузовика",
                 "короче, я пришел на работу и увидел директора",
@@ -237,7 +242,9 @@ def compile():
                 ]
 
     for test in my_tests:
-        pred = classifier.predict(test)
+        pred, inter = classifier.predict(test)
+        inter = inter[0]
+        flat_preds = (inter - min(inter)) / (max(inter) - min(inter))
         if pred == 0:
             ans = "filler"
         else:
@@ -245,9 +252,7 @@ def compile():
         print(f"Test: {test} \nPrediction: {pred} \nans: {ans}")
 
     from sklearn.metrics import precision_recall_fscore_support
-
     precision, recall, f1score = precision_recall_fscore_support(labels, predictions, average='macro')[:3]
-
     print(f'precision: {precision}, recall: {recall}, f1score: {f1score}')
 
 

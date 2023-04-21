@@ -1,9 +1,12 @@
+import torch
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 from sklearn.svm import SVC
+
+from SygnalsInterpretation.src.model.new_model import BertClassifier
 
 VOCABULARY_PATH="dataset/fillers.txt"
 POSITIVE_PATH="dataset/pos/text1.txt"
@@ -38,7 +41,7 @@ def fit():
     X_train = vectorizer.fit_transform(X_train)
     X_test = vectorizer.transform(X_test)
 
-    classifier = SVC(kernel='linear', probability=True)
+    classifier = LogisticRegression()
     classifier.fit(X_train, y_train)
     return classifier, vectorizer
 
@@ -61,18 +64,18 @@ def fit_example():
     X_train = vectorizer.fit_transform(X_train)
     X_test = vectorizer.transform(X_test)
 
-    """clf = LogisticRegression()
-    clf.fit(X_train, y_train)
+    #classifier = LogisticRegression()
+    #classifier.fit(X_train, y_train)
 
     # Evaluate the model on the test data
-    score = clf.score(X_test, y_test)
+    """score = clf.score(X_test, y_test)
     print("Test score:", score)"""
 
     # обучение
-    #classifier = RandomForestClassifier(n_estimators=100, random_state=0)
-    #classifier.fit(X_train, y_train)
-    classifier = SVC(kernel='linear', probability=True)
+    classifier = RandomForestClassifier(n_estimators=100, random_state=0)
     classifier.fit(X_train, y_train)
+    #classifier = SVC(kernel='rbf', probability=True, C=100)
+    #classifier.fit(X_train, y_train)
 
     # предсказываем
     y_pred = classifier.predict(X_test)
@@ -81,9 +84,8 @@ def fit_example():
     print(classification_report(y_test, y_pred))
     print(accuracy_score(y_test, y_pred))
 
-    ex = "Машинное обучение — класс методов искусственного интеллекта, \
-характерной чертой которых является непрямое решение задачи, \
-а обучение — за счет применения решений множество сходных задач"
+    ex = "Это машина кажется короче красного грузовика"
+    #ex = "короче, я пришел на работу и увидел директора"
     ex = vectorizer.transform([ex])
     indices = ex.indices
     yy = classifier.predict_proba(ex)
@@ -92,3 +94,5 @@ def fit_example():
     print("Filler words in sentence:", filler_words_in_sentence)
 
 #fit_example()
+
+
