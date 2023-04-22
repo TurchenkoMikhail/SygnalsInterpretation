@@ -71,6 +71,17 @@ def print_by_sentences(audio_file_path: str):
         input = input.lower()
         print(input)
 
+def get_text(audio_file_path: str):
+    answer = ""
+    sentences = load(audio_file_path)
+    sentences = get_sentences(sentences)
+    for sentence in sentences:
+        input = ' '.join(word['text'] for part in sentence for word in part)
+        input = input.lower()
+        answer = answer.join(input)
+        #print(input)
+    return input
+
 def get_segments_by_word(audio_file_path: str):
     start_time = []
     end_time = []
